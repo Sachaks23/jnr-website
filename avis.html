@@ -165,7 +165,6 @@
     listEl.innerHTML = '<p style="text-align:center;color:var(--muted);padding:2rem;">Chargement...</p>';
 
     db.collection('reviews')
-      .orderBy('date', 'desc')
       .onSnapshot(snapshot => {
         const reviews = snapshot.docs.map(doc => {
           const d = doc.data();
@@ -175,8 +174,9 @@
             stars: d.stars,
             text: d.text,
             date: ts ? ts.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
+            ts: ts || new Date(0),
           };
-        });
+        }).sort((a, b) => b.ts - a.ts);
 
         if (reviews.length === 0) {
           listEl.innerHTML = '';
