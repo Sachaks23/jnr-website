@@ -280,8 +280,7 @@
         commande_details: commandeDetails,
       });
     } catch (err) {
-      // Si EmailJS n'est pas encore configure, on continue quand meme
-      console.warn('EmailJS non configure ou erreur:', err);
+      alert('Erreur EmailJS : ' + (err?.text || err?.message || JSON.stringify(err)));
     }
 
     // Sauvegarder dans Firebase (si connecte)
