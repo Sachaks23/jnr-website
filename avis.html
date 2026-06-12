@@ -125,16 +125,7 @@
     });
   }
 
-  function getReviews() {
-    try { return JSON.parse(localStorage.getItem('s2p_reviews')) || []; }
-    catch { return []; }
-  }
-
-  function saveReviews(reviews) {
-    localStorage.setItem('s2p_reviews', JSON.stringify(reviews));
-  }
-
-  function submitReview(e) {
+  async function submitReview(e) {
     e.preventDefault();
     if (selectedStars === 0) { alert('Choisis une note avant de publier.'); return; }
 
@@ -142,52 +133,75 @@
     const text = document.getElementById('reviewText').value.trim();
     if (!prenom || !text) return;
 
-    const reviews = getReviews();
-    reviews.unshift({
-      prenom,
-      stars: selectedStars,
-      text,
-      date: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
-    });
-    saveReviews(reviews);
+    const btn = document.querySelector('#reviewForm button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Publication...';
 
-    // Reset form
-    document.getElementById('reviewForm').reset();
-    selectedStars = 0;
-    document.querySelectorAll('#starPicker span').forEach(el => el.classList.remove('active'));
+    try {
+      await db.collection('reviews').add({
+        prenom,
+        stars: selectedStars,
+        text,
+        date: firebase.firestore.FieldValue.serverTimestamp(),
+      });
 
-    renderReviews();
-    showToast('Avis publie !');
-    window.scrollTo({ top: document.getElementById('reviewsList').offsetTop - 100, behavior: 'smooth' });
-  }
-
-  function renderReviews() {
-    const reviews = getReviews();
-    const listEl = document.getElementById('reviewsList');
-    const noEl = document.getElementById('noReviews');
-
-    if (reviews.length === 0) {
-      listEl.innerHTML = '';
-      noEl.style.display = 'block';
-    } else {
-      noEl.style.display = 'none';
-      listEl.innerHTML = reviews.map(r => `
-        <div class="review-card">
-          <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
-          <p class="review-text">${escapeHtml(r.text)}</p>
-          <div class="review-author">
-            <div class="review-avatar">${r.prenom.charAt(0).toUpperCase()}</div>
-            <div>
-              <div class="review-name">${escapeHtml(r.prenom)}</div>
-              <div class="review-date">${r.date}</div>
-            </div>
-          </div>
-        </div>
-      `).join('');
+      document.getElementById('reviewForm').reset();
+      selectedStars = 0;
+      document.querySelectorAll('#starPicker span').forEach(el => el.classList.remove('active'));
+      showToast('Avis publié !');
+      window.scrollTo({ top: document.getElementById('reviewsList').offsetTop - 100, behavior: 'smooth' });
+    } catch(err) {
+      alert('Erreur lors de la publication, réessaie.');
+      console.warn(err);
     }
 
-    // Update summary
-    updateRatingSummary(reviews);
+    btn.disabled = false;
+    btn.textContent = 'Publier mon avis';
+  }
+
+  function loadReviews() {
+    const listEl = document.getElementById('reviewsList');
+    const noEl = document.getElementById('noReviews');
+    listEl.innerHTML = '<p style="text-align:center;color:var(--muted);padding:2rem;">Chargement...</p>';
+
+    db.collection('reviews')
+      .orderBy('date', 'desc')
+      .onSnapshot(snapshot => {
+        const reviews = snapshot.docs.map(doc => {
+          const d = doc.data();
+          const ts = d.date?.toDate?.();
+          return {
+            prenom: d.prenom,
+            stars: d.stars,
+            text: d.text,
+            date: ts ? ts.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : '',
+          };
+        });
+
+        if (reviews.length === 0) {
+          listEl.innerHTML = '';
+          noEl.style.display = 'block';
+        } else {
+          noEl.style.display = 'none';
+          listEl.innerHTML = reviews.map(r => `
+            <div class="review-card">
+              <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+              <p class="review-text">${escapeHtml(r.text)}</p>
+              <div class="review-author">
+                <div class="review-avatar">${r.prenom.charAt(0).toUpperCase()}</div>
+                <div>
+                  <div class="review-name">${escapeHtml(r.prenom)}</div>
+                  <div class="review-date">${r.date}</div>
+                </div>
+              </div>
+            </div>
+          `).join('');
+        }
+        updateRatingSummary(reviews);
+      }, err => {
+        listEl.innerHTML = '<p style="text-align:center;color:var(--muted);padding:2rem;">Impossible de charger les avis.</p>';
+        console.warn(err);
+      });
   }
 
   function updateRatingSummary(reviews) {
@@ -223,7 +237,7 @@
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  document.addEventListener('DOMContentLoaded', renderReviews);
+  document.addEventListener('DOMContentLoaded', loadReviews);
 </script>
 </body>
 </html>
