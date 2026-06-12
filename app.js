@@ -1,12 +1,6 @@
 // ===== PRODUCT DATA =====
 // Prix provisoires — modifiez ici pour changer les prix
-const PRICES = { '18k': 12.99, '28k': 17.99, '42k': 24.99 };
-
-const FLAVORS_18K = [
-  'Blueberry Ice', 'Watermelon Ice', 'Strawberry Watermelon', 'Mango Ice',
-  'Cool Mint', 'Peach Ice', 'Lemon Lime', 'Mixed Berries',
-  'Cola Ice', 'Grape Ice'
-];
+const PRICES = { '28k': 17.99, '42k': 24.99 };
 
 const FLAVORS_28K = [
   'Blueberry Ice', 'Watermelon Ice', 'Mango Ice', 'Strawberry Ice',
@@ -23,7 +17,6 @@ const FLAVORS_42K = [
 
 function buildProducts() {
   const products = [];
-  FLAVORS_18K.forEach(f => products.push({ id: `18k-${f.toLowerCase().replace(/ /g,'-')}`, type: '18k', label: 'JNR 18K', flavor: f, price: PRICES['18k'], bestSeller: false }));
   FLAVORS_28K.forEach(f => products.push({ id: `28k-${f.toLowerCase().replace(/ /g,'-')}`, type: '28k', label: 'JNR 28K', flavor: f, price: PRICES['28k'], bestSeller: false }));
   FLAVORS_42K.forEach(f => products.push({ id: `42k-${f.toLowerCase().replace(/ /g,'-')}`, type: '42k', label: 'JNR 42K', flavor: f, price: PRICES['42k'], bestSeller: true }));
   return products;
