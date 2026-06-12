@@ -290,7 +290,7 @@
     const loadingEl  = document.getElementById('loadingState');
     const contentEl  = document.getElementById('compteContent');
 
-    if (!user || !user.emailVérified) {
+    if (!user) {
       window.location.href = 'login.html';
       return;
     }

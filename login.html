@@ -294,12 +294,6 @@
         ? firebase.auth.Auth.Persistence.LOCAL
         : firebase.auth.Auth.Persistence.SESSION);
       const cred = await auth.signInWithEmailAndPassword(email, pwd);
-      if (!cred.user.emailVérified) {
-        await auth.signOut();
-        showError('loginError', 'Vérifie ton email — un lien de confirmation t\'a ete envoye a la creation du compte.');
-        btn.disabled = false; btn.textContent = 'Se connecter';
-        return;
-      }
       if (remember) localStorage.setItem('s2p_login_date', Date.now().toString());
       window.location.href = 'compte.html';
     } catch (err) {
