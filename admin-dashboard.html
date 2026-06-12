@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Admin — shop2puff</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { padding: 2rem 5%; max-width: 1000px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; font-weight: 900; margin: 2rem 0 0.3rem; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { color: var(--muted); font-size: 0.88rem; margin-bottom: 2rem; }
+
+    /* LOGIN */
+    #loginSection { min-height: 60vh; display: flex; align-items: center; justify-content: center; }
+    .login-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 380px; width: 100%; }
+    .login-box h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; }
+    .msg { padding: 0.8rem 1rem; border-radius: 10px; font-size: 0.85rem; margin-top: 1rem; display: none; }
+    .msg.err { background: rgba(244,63,142,0.08); border: 1px solid rgba(244,63,142,0.25); color: #fca5a5; }
+    label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
+    input, select { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1rem; color: var(--text); font-size: 0.9rem; font-family: inherit; outline: none; margin-bottom: 1rem; -webkit-text-fill-color: var(--text); }
+    input:focus, select:focus { border-color: var(--cyan); }
+    .btn { background: var(--grad); color: #fff; border: none; border-radius: 50px; padding: 0.75rem 2rem; font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: transform 0.2s; }
+    .btn:hover { transform: translateY(-2px); }
+
+    /* STATS */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.4rem 1.6rem; }
+    .stat-label { font-size: 0.75rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+    .stat-value { font-size: 2rem; font-weight: 900; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-sub { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* CHART */
+    .chart-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 2rem; }
+    .chart-card h2 { font-size: 0.95rem; font-weight: 800; margin-bottom: 1.2rem; }
+    .chart-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .chart-tab { background: var(--bg3); border: 1px solid var(--border); border-radius: 50px; padding: 0.35rem 0.9rem; font-size: 0.78rem; font-weight: 700; cursor: pointer; color: var(--muted); transition: all 0.2s; }
+    .chart-tab.active { background: var(--grad); border-color: transparent; color: #fff; }
+
+    /* ORDERS */
+    .orders-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 1.5rem; margin-bottom: 2rem; }
+    .orders-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.2rem; }
+    .orders-header h2 { font-size: 0.95rem; font-weight: 800; margin: 0; }
+    .filter-wrap { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-pill { background: var(--bg3); border: 1px solid var(--border); border-radius: 50px; padding: 0.3rem 0.8rem; font-size: 0.75rem; font-weight: 700; cursor: pointer; color: var(--muted); transition: all 0.2s; }
+    .filter-pill.active { background: var(--grad); border-color: transparent; color: #fff; }
+
+    .order-row { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.7rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+    .order-row-left { flex: 1; min-width: 200px; }
+    .order-snap { font-weight: 800; font-size: 0.95rem; color: var(--cyan); }
+    .order-prenom { font-size: 0.82rem; color: var(--muted); margin-top: 0.1rem; }
+    .order-items { font-size: 0.82rem; color: var(--text); margin-top: 0.4rem; }
+    .order-meta { font-size: 0.75rem; color: var(--muted); margin-top: 0.3rem; }
+    .order-row-right { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; }
+    .order-total { font-weight: 900; font-size: 1rem; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap; }
+    .order-date { font-size: 0.75rem; color: var(--muted); }
+
+    .status-select { background: var(--bg2); border: 1px solid var(--border); border-radius: 50px; padding: 0.3rem 0.8rem; font-size: 0.75rem; font-weight: 700; color: var(--text); cursor: pointer; width: auto; margin: 0; -webkit-text-fill-color: var(--text); }
+    .status-select.pending { border-color: rgba(255,180,0,0.4); color: #fbbf24; -webkit-text-fill-color: #fbbf24; }
+    .status-select.delivered { border-color: rgba(0,229,255,0.4); color: var(--cyan); -webkit-text-fill-color: var(--cyan); }
+    .status-select.cancelled { border-color: rgba(244,63,142,0.4); color: var(--pink); -webkit-text-fill-color: var(--pink); }
+
+    .empty-msg { color: var(--muted); font-size: 0.88rem; text-align: center; padding: 2rem; }
+    .loading-msg { color: var(--muted); font-size: 0.88rem; padding: 1rem 0; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+
+<div id="loginSection">
+  <div class="login-box">
+    <h2>Accès admin</h2>
+    <label>Email</label>
+    <input type="email" id="adminEmail" placeholder="ton@mail.com" />
+    <label>Mot de passe</label>
+    <input type="password" id="adminPwd" placeholder="••••••••" />
+    <button class="btn" style="width:100%;" onclick="adminLogin()">Connexion</button>
+    <div class="msg err" id="loginMsg"></div>
+  </div>
+</div>
+
+<div id="dashboard" style="display:none;">
+  <h1>Dashboard</h1>
+  <p class="subtitle">shop2puff — <span id="adminEmailDisplay"></span> <a href="#" onclick="auth.signOut();location.reload();" style="color:var(--pink);font-size:0.85rem;margin-left:0.5rem;">Déconnexion</a></p>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Aujourd'hui</div>
+      <div class="stat-value" id="statToday">—</div>
+      <div class="stat-sub" id="statTodayRevenu"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Cette semaine</div>
+      <div class="stat-value" id="statWeek">—</div>
+      <div class="stat-sub" id="statWeekRevenu"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ce mois</div>
+      <div class="stat-value" id="statMonth">—</div>
+      <div class="stat-sub" id="statMonthRevenu"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total</div>
+      <div class="stat-value" id="statTotal">—</div>
+      <div class="stat-sub" id="statTotalRevenu"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">En attente</div>
+      <div class="stat-value" id="statPending" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">—</div>
+      <div class="stat-sub">à traiter</div>
+    </div>
+  </div>
+
+  <!-- GRAPHIQUE -->
+  <div class="chart-card">
+    <h2>Commandes par jour</h2>
+    <div class="chart-tabs">
+      <button class="chart-tab active" onclick="setChartPeriod(7, this)">7 jours</button>
+      <button class="chart-tab" onclick="setChartPeriod(30, this)">30 jours</button>
+    </div>
+    <canvas id="ordersChart" height="80"></canvas>
+  </div>
+
+  <!-- COMMANDES -->
+  <div class="orders-card">
+    <div class="orders-header">
+      <h2>Commandes <span id="orderCountBadge" style="background:var(--grad);color:#fff;font-size:0.72rem;font-weight:800;padding:0.2rem 0.6rem;border-radius:50px;"></span></h2>
+      <div class="filter-wrap">
+        <button class="filter-pill active" onclick="setStatusFilter('all', this)">Toutes</button>
+        <button class="filter-pill" onclick="setStatusFilter('pending', this)">En attente</button>
+        <button class="filter-pill" onclick="setStatusFilter('delivered', this)">Livrées</button>
+        <button class="filter-pill" onclick="setStatusFilter('cancelled', this)">Annulées</button>
+      </div>
+    </div>
+    <div id="ordersList"><div class="loading-msg">Chargement...</div></div>
+  </div>
+
+</div>
+
+<script>
+  const ADMIN_UID = 'R9sJDzxvl5cC2iTJZTR7X1u30gH3';
+
+  let allOrders = [];
+  let currentFilter = 'all';
+  let chart = null;
+
+  async function adminLogin() {
+    const email = document.getElementById('adminEmail').value.trim();
+    const pwd   = document.getElementById('adminPwd').value;
+    const msg   = document.getElementById('loginMsg');
+    try {
+      await auth.signInWithEmailAndPassword(email, pwd);
+    } catch(e) {
+      msg.textContent = 'Email ou mot de passe incorrect.';
+      msg.style.display = 'block';
+    }
+  }
+
+  auth.onAuthStateChanged(async user => {
+    if (!user) return;
+    if (user.uid !== ADMIN_UID) { auth.signOut(); alert('Accès refusé.'); return; }
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('adminEmailDisplay').textContent = user.email;
+    loadOrders();
+  });
+
+  async function loadOrders() {
+    const snap = await db.collection('orders').orderBy('date', 'desc').get();
+    allOrders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    computeStats();
+    renderChart(7);
+    renderOrders();
+  }
+
+  function orderTotal(o) {
+    return (o.items || []).reduce((s, i) => s + (i.price * i.qty), 0);
+  }
+
+  function computeStats() {
+    const now   = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const week  = new Date(today); week.setDate(today.getDate() - 6);
+    const month = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    let todayC=0, todayR=0, weekC=0, weekR=0, monthC=0, monthR=0, totalC=0, totalR=0, pending=0;
+
+    for (const o of allOrders) {
+      const d = o.date?.toDate ? o.date.toDate() : null;
+      const t = orderTotal(o);
+      totalC++; totalR += t;
+      if (o.status === 'pending') pending++;
+      if (d) {
+        if (d >= month) { monthC++; monthR += t; }
+        if (d >= week)  { weekC++;  weekR  += t; }
+        if (d >= today) { todayC++; todayR += t; }
+      }
+    }
+
+    const fmt = n => n.toFixed(2).replace('.', ',') + ' €';
+    document.getElementById('statToday').textContent     = todayC;
+    document.getElementById('statTodayRevenu').textContent = fmt(todayR);
+    document.getElementById('statWeek').textContent      = weekC;
+    document.getElementById('statWeekRevenu').textContent  = fmt(weekR);
+    document.getElementById('statMonth').textContent     = monthC;
+    document.getElementById('statMonthRevenu').textContent = fmt(monthR);
+    document.getElementById('statTotal').textContent     = totalC;
+    document.getElementById('statTotalRevenu').textContent = fmt(totalR);
+    document.getElementById('statPending').textContent   = pending;
+  }
+
+  function renderChart(days) {
+    const labels = [];
+    const data   = [];
+    const now    = new Date();
+
+    for (let i = days - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      labels.push(d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }));
+      const count = allOrders.filter(o => {
+        const od = o.date?.toDate ? o.date.toDate() : null;
+        if (!od) return false;
+        return od.getFullYear() === d.getFullYear() && od.getMonth() === d.getMonth() && od.getDate() === d.getDate();
+      }).length;
+      data.push(count);
+    }
+
+    if (chart) chart.destroy();
+    const ctx = document.getElementById('ordersChart').getContext('2d');
+    chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: 'rgba(0,229,255,0.2)',
+          borderColor: 'rgba(0,229,255,0.8)',
+          borderWidth: 2,
+          borderRadius: 6,
+        }]
+      },
+      options: {
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888', font: { size: 11 } } },
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888', font: { size: 11 }, stepSize: 1 }, beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  function setChartPeriod(days, btn) {
+    document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderChart(days);
+  }
+
+  function setStatusFilter(status, btn) {
+    currentFilter = status;
+    document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderOrders();
+  }
+
+  function renderOrders() {
+    const filtered = currentFilter === 'all' ? allOrders : allOrders.filter(o => o.status === currentFilter);
+    document.getElementById('orderCountBadge').textContent = filtered.length;
+    const el = document.getElementById('ordersList');
+
+    if (filtered.length === 0) {
+      el.innerHTML = '<div class="empty-msg">Aucune commande dans cette catégorie.</div>';
+      return;
+    }
+
+    el.innerHTML = filtered.map(o => {
+      const date = o.date?.toDate
+        ? o.date.toDate().toLocaleString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+        : '—';
+      const items = (o.items || []).map(i => `${i.name} x${i.qty}`).join(', ');
+      const total = orderTotal(o).toFixed(2).replace('.', ',');
+      const status = o.status || 'pending';
+
+      return `
+        <div class="order-row" id="row-${o.id}">
+          <div class="order-row-left">
+            <div class="order-snap">@${o.snap || '—'}</div>
+            <div class="order-prenom">${o.prenom || ''} — ${o.address || ''}</div>
+            <div class="order-items">${items}</div>
+            <div class="order-meta">${o.delivery || ''} · ${o.payment || ''}</div>
+          </div>
+          <div class="order-row-right">
+            <div>
+              <div class="order-total">${total} €</div>
+              <div class="order-date">${date}</div>
+            </div>
+            <select class="status-select ${status}" onchange="updateStatus('${o.id}', this)">
+              <option value="pending"   ${status==='pending'   ? 'selected':''}>En attente</option>
+              <option value="delivered" ${status==='delivered' ? 'selected':''}>Livrée</option>
+              <option value="cancelled" ${status==='cancelled' ? 'selected':''}>Annulée</option>
+            </select>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  async function updateStatus(orderId, sel) {
+    const newStatus = sel.value;
+    sel.className = `status-select ${newStatus}`;
+    await db.collection('orders').doc(orderId).update({ status: newStatus });
+    // Met à jour en mémoire
+    const o = allOrders.find(x => x.id === orderId);
+    if (o) o.status = newStatus;
+    computeStats();
+  }
+</script>
+</body>
+</html>

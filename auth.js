@@ -24,12 +24,18 @@ async function saveOrderToFirestore(orderData) {
     const userRef = db.collection('users').doc(user.uid);
     const itemsCount = orderData.items.reduce((s, i) => s + i.qty, 0);
 
-    // Ajoute la commande
-    await userRef.collection('orders').add({
+    const orderPayload = {
       ...orderData,
       date: firebase.firestore.FieldValue.serverTimestamp(),
       uid: user.uid,
-    });
+      status: 'pending',
+    };
+
+    // Ajoute dans le profil utilisateur
+    await userRef.collection('orders').add(orderPayload);
+
+    // Ajoute aussi dans la collection globale pour l'admin dashboard
+    await db.collection('orders').add(orderPayload);
 
     // Met a jour le compteur de fidelite
     await userRef.set({
