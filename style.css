@@ -915,6 +915,22 @@ footer p { color: var(--muted); font-size: 0.85rem; line-height: 1.8; }
   .form-row { grid-template-columns: 1fr; }
   .payment-options { grid-template-columns: 1fr; }
   .rating-summary { flex-direction: column; gap: 1.5rem; }
+
+  /* Products grid : 1 colonne sur mobile */
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Prix produit plus compact */
+  .product-price {
+    font-size: 1rem;
+  }
+
+  /* Espace en bas pour que le bouton panier fixe ne cache pas le contenu */
+  body { padding-bottom: 5rem; }
+
+  /* Sections produits moins de padding */
+  .products-section { padding: 2rem 4%; }
 }
 
 /* ===== ANIMATIONS ===== */

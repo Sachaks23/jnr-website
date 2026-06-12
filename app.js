@@ -126,7 +126,7 @@ function renderHomepageProducts(containerId) {
         <div class="product-type-label">${p.label}</div>
         <div class="product-name">${p.flavor}</div>
         <div class="product-footer">
-          <div class="product-price">À partir de ${p.price.toFixed(2).replace('.', ',')} €</div>
+          <div class="product-price">${p.price.toFixed(2).replace('.', ',')} €</div>
           <a href="produits.html" class="add-to-cart" style="text-decoration:none;">Voir les gouts</a>
         </div>
       </div>
