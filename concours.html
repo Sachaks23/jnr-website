@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Concours — shop2puff</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ===== CONCOURS PAGE ===== */
+    .concours-page { padding: 9rem 5% 5rem; max-width: 1000px; margin: 0 auto; }
+
+    /* HERO CONCOURS */
+    .concours-hero {
+      background: var(--bg2);
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 2.5rem;
+      position: relative;
+    }
+    .concours-hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(124,58,237,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .concours-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+    }
+    @media (max-width: 700px) { .concours-body { grid-template-columns: 1fr; } }
+
+    .concours-img {
+      aspect-ratio: 1;
+      background: var(--bg3);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      min-height: 260px;
+    }
+    .concours-img img { width: 100%; height: 100%; object-fit: cover; }
+    .concours-img-placeholder {
+      display: flex; flex-direction: column; align-items: center; gap: 0.8rem;
+      color: var(--muted); font-size: 0.85rem; text-align: center; padding: 2rem;
+    }
+    .concours-img-placeholder svg { opacity: 0.2; }
+
+    .concours-info { padding: 2.5rem; display: flex; flex-direction: column; justify-content: center; }
+    .concours-tag {
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--purple); margin-bottom: 0.6rem;
+    }
+    .concours-title {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 900; letter-spacing: -0.5px;
+      margin-bottom: 0.8rem;
+    }
+    .concours-desc { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 1.5rem; }
+
+    /* COUNTDOWN */
+    .countdown-wrap {
+      display: flex; gap: 0.8rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .countdown-block {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.8rem 1rem;
+      text-align: center;
+      min-width: 64px;
+    }
+    .countdown-num {
+      font-size: 1.8rem; font-weight: 900;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+    .countdown-label { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.3rem; }
+
+    /* TICKETS USER */
+    .ticket-banner {
+      background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(0,229,255,0.08));
+      border: 1px solid rgba(124,58,237,0.3);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 0.8rem;
+    }
+    .ticket-count {
+      font-size: 1.8rem; font-weight: 900;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .ticket-info { font-size: 0.85rem; color: var(--muted); }
+    .ticket-info strong { color: var(--text); }
+
+    .not-logged-banner {
+      background: rgba(0,229,255,0.06);
+      border: 1px solid rgba(0,229,255,0.2);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .not-logged-banner a { color: var(--cyan); font-weight: 700; }
+
+    /* RÈGLES */
+    .rules-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+    }
+    .rules-card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 1.2rem; }
+    .rules-list { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+    .rules-list li {
+      display: flex; align-items: flex-start; gap: 0.8rem;
+      font-size: 0.88rem; color: var(--muted); line-height: 1.6;
+    }
+    .rule-num {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--grad);
+      color: #fff; font-size: 0.7rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* HISTORIQUE */
+    .history-section { margin-top: 1rem; }
+    .history-title {
+      font-size: 1.1rem; font-weight: 800;
+      margin-bottom: 1.5rem;
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+    .history-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .history-card:hover { border-color: rgba(124,58,237,0.3); transform: translateY(-3px); }
+
+    .history-card-img {
+      width: 100%; aspect-ratio: 16/9;
+      background: var(--bg3);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .history-card-img img { width: 100%; height: 100%; object-fit: cover; }
+    .history-card-img-placeholder { color: var(--muted); font-size: 0.8rem; opacity: 0.4; }
+
+    .history-card-info { padding: 1.2rem; }
+    .history-card-date { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+    .history-card-prize { font-size: 1rem; font-weight: 800; margin-bottom: 0.4rem; }
+    .history-card-winner {
+      font-size: 0.82rem; color: var(--muted);
+    }
+    .history-card-winner strong {
+      color: var(--gold); font-weight: 700;
+    }
+
+    /* CONCOURS TERMINE */
+    .concours-ended {
+      text-align: center; padding: 3rem;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 2.5rem;
+    }
+    .concours-ended h2 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
+    .concours-ended p { color: var(--muted); font-size: 0.9rem; }
+
+    .loading-concours {
+      text-align: center; padding: 4rem;
+      color: var(--muted); font-size: 0.9rem;
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">shop2puff</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="produits.html">Produits</a></li>
+    <li><a href="concours.html" class="active">Concours</a></li>
+    <li><a href="avis.html">Avis</a></li>
+    <li><a href="livraison.html">Livraison</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <a id="accountNavLink" class="nav-account-link" href="login.html">Connexion</a>
+    <button class="nav-hamburger" id="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<button class="cart-btn" onclick="openCart()">Panier<span class="cart-count" id="cartCount">0</span></button>
+
+<div class="concours-page">
+
+  <!-- CONCOURS EN COURS -->
+  <div id="concoursCurrent">
+    <div class="loading-concours">Chargement du concours...</div>
+  </div>
+
+  <!-- REGLES -->
+  <div class="rules-card">
+    <h3>Comment ca marche ?</h3>
+    <ul class="rules-list">
+      <li><div class="rule-num">1</div><span>Crée ton compte sur shop2puff et commande tes puffs.</span></li>
+      <li><div class="rule-num">2</div><span>Pour chaque tranche de <strong style="color:var(--text);">2 puffs achetées</strong>, tu recois automatiquement <strong style="color:var(--text);">1 ticket</strong> pour le concours en cours.</span></li>
+      <li><div class="rule-num">3</div><span>Tes tickets s'accumulent jusqu'a la date du tirage — plus tu achetes, plus tu as de chances de gagner.</span></li>
+      <li><div class="rule-num">4</div><span>Le tirage au sort est realise en live dans la story Snap <strong style="color:var(--cyan);">@shop.2peu</strong> via une roue avec les pseudos de tous les participants. Le gagnant est contacte directement.</span></li>
+      <li><div class="rule-num">5</div><span>Un nouveau concours demarre toutes les 2 a 4 semaines avec un nouveau lot a gagner.</span></li>
+    </ul>
+  </div>
+
+  <!-- HISTORIQUE -->
+  <div class="history-section">
+    <div class="history-title">
+      Anciens concours
+      <span class="order-count-badge" id="historyCount" style="background:var(--grad);color:#fff;font-size:0.72rem;font-weight:800;padding:0.2rem 0.6rem;border-radius:50px;">0</span>
+    </div>
+    <div class="history-grid" id="historyGrid">
+      <p style="color:var(--muted);font-size:0.9rem;">Aucun ancien concours pour le moment. Le premier tirage arrive bientot !</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">shop2puff</div>
+  <p>Vente de puffs JNR — Livraison rapide partout en France</p>
+  <ul class="footer-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="produits.html">Produits</a></li>
+    <li><a href="concours.html">Concours</a></li>
+    <li><a href="avis.html">Avis</a></li>
+    <li><a href="livraison.html">Livraison</a></li>
+  </ul>
+  <p class="footer-copy">© 2025 shop2puff. Vente réservée aux personnes majeures (18 ans et plus).</p>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header"><h3>Mon panier</h3><button class="cart-close" onclick="closeCart()">x</button></div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter"></div>
+</div>
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script src="cart.js"></script>
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script>
+  let countdownTimer = null;
+
+  // ===== CHARGEMENT PRINCIPAL =====
+  async function loadConcours() {
+    const currentEl = document.getElementById('concoursCurrent');
+
+    try {
+      // Concours actif
+      const activeSnap = await db.collection('contests')
+        .where('active', '==', true)
+        .limit(1)
+        .get();
+
+      if (activeSnap.empty) {
+        currentEl.innerHTML = `
+          <div class="concours-ended">
+            <h2>Aucun concours en cours</h2>
+            <p>Le prochain tirage arrive bientot. Reviens vite !</p>
+          </div>`;
+      } else {
+        const doc = activeSnap.docs[0];
+        const contest = doc.data();
+        renderActiveContest(doc.id, contest, currentEl);
+      }
+
+      // Historique
+      const pastSnap = await db.collection('contests')
+        .where('active', '==', false)
+        .orderBy('endDate', 'desc')
+        .limit(6)
+        .get();
+      renderHistory(pastSnap);
+
+    } catch (err) {
+      currentEl.innerHTML = `<div class="concours-ended"><h2>Chargement impossible</h2><p>Vérifie ta connexion.</p></div>`;
+      console.error(err);
+    }
+  }
+
+  function renderActiveContest(contestId, contest, el) {
+    const endDate = contest.endDate?.toDate ? contest.endDate.toDate() : new Date(contest.endDate);
+
+    el.innerHTML = `
+      <div class="concours-hero" style="margin-bottom:2.5rem;">
+        <div class="concours-body">
+          <div class="concours-img" id="contestImgWrap">
+            ${contest.prizePhoto
+              ? `<img src="${contest.prizePhoto}" alt="${contest.prize}" />`
+              : `<div class="concours-img-placeholder">
+                  <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span>Photo du lot a venir</span>
+                </div>`}
+          </div>
+          <div class="concours-info">
+            <div class="concours-tag">Concours en cours</div>
+            <div class="concours-title">${contest.prize}</div>
+            <div class="concours-desc">${contest.description || 'Commande tes puffs et cumule des tickets pour tenter de gagner ce lot !'}</div>
+            <div class="countdown-wrap" id="countdown"></div>
+            <div id="ticketSection"></div>
+          </div>
+        </div>
+      </div>`;
+
+    // Countdown
+    startCountdown(endDate);
+
+    // Tickets utilisateur
+    auth.onAuthStateChanged(async user => {
+      const ticketEl = document.getElementById('ticketSection');
+      if (!ticketEl) return;
+      if (!user) {
+        ticketEl.innerHTML = `
+          <div class="not-logged-banner">
+            <a href="login.html">Connecte-toi</a> pour voir tes tickets et participer au concours.
+          </div>`;
+        return;
+      }
+      try {
+        const ticketDoc = await db.collection('users').doc(user.uid)
+          .collection('contestTickets').doc(contestId).get();
+        const tickets = ticketDoc.exists ? (ticketDoc.data().tickets || 0) : 0;
+        ticketEl.innerHTML = `
+          <div class="ticket-banner">
+            <div>
+              <div style="font-size:0.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.2rem;">Tes tickets pour ce concours</div>
+              <div class="ticket-count">${tickets} ticket${tickets > 1 ? 's' : ''}</div>
+            </div>
+            <div class="ticket-info">
+              <strong>${tickets > 0 ? 'Tu es dans le tirage !' : 'Commande pour participer'}</strong><br>
+              1 ticket toutes les 2 puffs achetées
+            </div>
+          </div>`;
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  }
+
+  function startCountdown(endDate) {
+    if (countdownTimer) clearInterval(countdownTimer);
+    function update() {
+      const el = document.getElementById('countdown');
+      if (!el) { clearInterval(countdownTimer); return; }
+      const diff = endDate - Date.now();
+      if (diff <= 0) {
+        el.innerHTML = `<div class="countdown-block"><div class="countdown-num" style="-webkit-text-fill-color:var(--pink);">Termine</div></div>`;
+        clearInterval(countdownTimer); return;
+      }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      el.innerHTML = [
+        { n: d, l: 'Jours' }, { n: h, l: 'Heures' },
+        { n: m, l: 'Minutes' }, { n: s, l: 'Secondes' }
+      ].map(x => `
+        <div class="countdown-block">
+          <div class="countdown-num">${String(x.n).padStart(2,'0')}</div>
+          <div class="countdown-label">${x.l}</div>
+        </div>`).join('');
+    }
+    update();
+    countdownTimer = setInterval(update, 1000);
+  }
+
+  function renderHistory(snap) {
+    const grid = document.getElementById('historyGrid');
+    const badge = document.getElementById('historyCount');
+    badge.textContent = snap.size;
+    if (snap.empty) return;
+    grid.innerHTML = snap.docs.map(doc => {
+      const c = doc.data();
+      const date = c.endDate?.toDate
+        ? c.endDate.toDate().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+        : '—';
+      return `
+        <div class="history-card">
+          <div class="history-card-img">
+            ${c.prizePhoto
+              ? `<img src="${c.prizePhoto}" alt="${c.prize}" />`
+              : `<div class="history-card-img-placeholder">Photo non disponible</div>`}
+          </div>
+          <div class="history-card-info">
+            <div class="history-card-date">${date}</div>
+            <div class="history-card-prize">${c.prize}</div>
+            ${c.winner ? `<div class="history-card-winner">Gagnant : <strong>@${c.winner}</strong></div>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  document.addEventListener('DOMContentLoaded', loadConcours);
+</script>
+</body>
+</html>

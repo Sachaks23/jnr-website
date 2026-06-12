@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Concours — shop2puff</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { padding: 2rem 5%; max-width: 800px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; font-weight: 900; margin: 2rem 0 0.5rem; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+    .admin-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 2rem; margin-bottom: 1.5rem; }
+    .admin-card h2 { font-size: 1rem; font-weight: 800; margin-bottom: 1.5rem; }
+    label { display: block; font-size: 0.78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem; }
+    input, textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 1rem; color: var(--text); font-size: 0.9rem; font-family: inherit; outline: none; margin-bottom: 1rem; -webkit-text-fill-color: var(--text); }
+    input:focus, textarea:focus { border-color: var(--cyan); }
+    .btn { background: var(--grad); color: #fff; border: none; border-radius: 50px; padding: 0.8rem 2rem; font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: transform 0.2s; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-danger { background: linear-gradient(135deg, var(--pink), #c2185b); margin-left: 0.8rem; }
+    .contest-row { background: var(--bg3); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.2rem; margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem; }
+    .contest-row-info { flex: 1; }
+    .contest-row-name { font-weight: 700; font-size: 0.95rem; }
+    .contest-row-date { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+    .badge-active { background: rgba(0,229,255,0.15); border: 1px solid rgba(0,229,255,0.3); color: var(--cyan); font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 50px; margin-left: 0.5rem; }
+    .badge-done { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted); font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 50px; margin-left: 0.5rem; }
+    .msg { padding: 0.8rem 1rem; border-radius: 10px; font-size: 0.85rem; margin-top: 1rem; display: none; }
+    .msg.ok { background: rgba(0,229,255,0.08); border: 1px solid rgba(0,229,255,0.25); color: var(--cyan); }
+    .msg.err { background: rgba(244,63,142,0.08); border: 1px solid rgba(244,63,142,0.25); color: #fca5a5; }
+    .participants-list { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem; }
+    .participant-row { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 0.8rem 1rem; display: flex; justify-content: space-between; font-size: 0.88rem; }
+    .snap-name { color: var(--cyan); font-weight: 700; }
+    .ticket-num { color: var(--muted); }
+    #loginSection { min-height: 60vh; display: flex; align-items: center; justify-content: center; }
+    .login-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; max-width: 380px; width: 100%; }
+    .login-box h2 { font-size: 1.1rem; font-weight: 800; margin-bottom: 1.5rem; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+
+<div id="loginSection">
+  <div class="login-box">
+    <h2>Accès admin</h2>
+    <label>Email</label>
+    <input type="email" id="adminEmail" placeholder="ton@mail.com" />
+    <label>Mot de passe</label>
+    <input type="password" id="adminPwd" placeholder="••••••••" />
+    <button class="btn" style="width:100%;" onclick="adminLogin()">Connexion</button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+</div>
+
+<div id="adminPanel" style="display:none;">
+  <h1>Admin Concours</h1>
+  <p class="subtitle">Gère les concours shop2puff — <span id="adminEmail2"></span> <a href="#" onclick="auth.signOut();location.reload();" style="color:var(--pink);font-size:0.85rem;margin-left:0.5rem;">Déconnexion</a></p>
+
+  <!-- CREER UN CONCOURS -->
+  <div class="admin-card">
+    <h2>Créer un nouveau concours</h2>
+    <label>Lot à gagner *</label>
+    <input type="text" id="newPrize" placeholder="Ex: Billet PSG vs OM, Carte cadeau 50€..." />
+    <label>Description (optionnel)</label>
+    <textarea id="newDesc" rows="2" placeholder="Décris le lot en quelques mots..."></textarea>
+    <label>URL de la photo du lot *</label>
+    <input type="text" id="newPhoto" placeholder="https://exemple.com/photo.jpg (héberge ta photo sur imgur.com)" />
+    <label>Date du tirage *</label>
+    <input type="datetime-local" id="newEndDate" />
+    <button class="btn" onclick="createContest()">Lancer le concours</button>
+    <div class="msg" id="createMsg"></div>
+  </div>
+
+  <!-- CONCOURS ACTIF -->
+  <div class="admin-card">
+    <h2>Concours en cours</h2>
+    <div id="activeContest"><p style="color:var(--muted);font-size:0.9rem;">Aucun concours actif.</p></div>
+  </div>
+
+  <!-- PARTICIPANTS -->
+  <div class="admin-card" id="participantsCard" style="display:none;">
+    <h2>Participants <span id="contestNameInTitle" style="color:var(--cyan);"></span></h2>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Liste des snaps et tickets pour le tirage en story Snap.</p>
+    <ul class="participants-list" id="participantsList"></ul>
+    <div id="noParticipants" style="color:var(--muted);font-size:0.85rem;display:none;">Aucun participant pour le moment.</div>
+
+    <!-- ROUE -->
+    <div id="wheelSection" style="margin-top:1.5rem;display:none;">
+      <h2 style="margin-bottom:0.8rem;">Roue du tirage</h2>
+      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Chaque snap apparait autant de fois que le participant a de tickets. Copie la liste et colle-la sur <strong style="color:var(--cyan);">wheelofnames.com</strong> pour faire tourner la roue en story.</p>
+      <textarea id="wheelList" rows="8" readonly style="font-size:0.82rem;line-height:1.7;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:0.9rem;width:100%;color:var(--text);font-family:monospace;resize:vertical;-webkit-text-fill-color:var(--text);"></textarea>
+      <div style="display:flex;align-items:center;gap:0.8rem;margin-top:0.8rem;flex-wrap:wrap;">
+        <button class="btn" onclick="copyWheelList()">Copier la liste</button>
+        <a href="https://wheelofnames.com" target="_blank" class="btn" style="background:linear-gradient(135deg,#7c3aed,#06b6d4);text-decoration:none;display:inline-flex;align-items:center;">Ouvrir wheelofnames.com</a>
+        <div class="msg" id="copyMsg" style="margin:0;"></div>
+      </div>
+    </div>
+
+    <div id="clotureSection" style="margin-top:1.5rem;display:none;">
+      <label>Snap du gagnant *</label>
+      <input type="text" id="winnerSnap" placeholder="@snap_du_gagnant" style="margin-bottom:0.5rem;" />
+      <button class="btn" onclick="closeContest()">Clore le concours et annoncer le gagnant</button>
+      <div class="msg" id="clotureMsg"></div>
+    </div>
+  </div>
+
+  <!-- HISTORIQUE -->
+  <div class="admin-card">
+    <h2>Historique des concours</h2>
+    <div id="historyList"><p style="color:var(--muted);font-size:0.9rem;">Chargement...</p></div>
+  </div>
+</div>
+
+<script>
+  // ============================================================
+  // REMPLACE PAR TON UID FIREBASE (visible dans Authentication > Utilisateurs > ID utilisateur)
+  const ADMIN_UID = 'R9sJDzxvl5cC2iTJZTR7X1u30gH3';
+  // ============================================================
+
+  let currentContestId = null;
+
+  async function adminLogin() {
+    const email = document.getElementById('adminEmail').value.trim();
+    const pwd   = document.getElementById('adminPwd').value;
+    const msg   = document.getElementById('loginMsg');
+    try {
+      await auth.signInWithEmailAndPassword(email, pwd);
+    } catch(e) {
+      msg.textContent = 'Email ou mot de passe incorrect.';
+      msg.className = 'msg err'; msg.style.display = 'block';
+    }
+  }
+
+  auth.onAuthStateChanged(async user => {
+    if (!user) return;
+    // Vérifie que c'est bien l'admin
+    if (!user.uid.startsWith(ADMIN_UID.substring(0, 10))) {
+      auth.signOut();
+      alert('Accès refuse.');
+      return;
+    }
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('adminEmail2').textContent = user.email;
+    loadActiveContest();
+    loadHistory();
+  });
+
+  async function createContest() {
+    const prize   = document.getElementById('newPrize').value.trim();
+    const desc    = document.getElementById('newDesc').value.trim();
+    const photo   = document.getElementById('newPhoto').value.trim();
+    const endDate = document.getElementById('newEndDate').value;
+    const msg     = document.getElementById('createMsg');
+
+    if (!prize || !endDate) {
+      msg.textContent = 'Remplis au moins le lot et la date.';
+      msg.className = 'msg err'; msg.style.display = 'block'; return;
+    }
+
+    try {
+      // Désactive l'ancien concours actif
+      const old = await db.collection('contests').where('active','==',true).get();
+      for (const d of old.docs) await d.ref.update({ active: false });
+
+      // Cree le nouveau
+      await db.collection('contests').add({
+        prize, description: desc, prizePhoto: photo,
+        endDate: new Date(endDate),
+        active: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        winner: null,
+      });
+
+      msg.textContent = 'Concours créé et lancé !';
+      msg.className = 'msg ok'; msg.style.display = 'block';
+      document.getElementById('newPrize').value = '';
+      document.getElementById('newDesc').value = '';
+      document.getElementById('newPhoto').value = '';
+      document.getElementById('newEndDate').value = '';
+      loadActiveContest();
+      loadHistory();
+    } catch(e) {
+      msg.textContent = 'Erreur : ' + e.message;
+      msg.className = 'msg err'; msg.style.display = 'block';
+    }
+  }
+
+  async function loadActiveContest() {
+    const el = document.getElementById('activeContest');
+    const snap = await db.collection('contests').where('active','==',true).limit(1).get();
+    if (snap.empty) {
+      el.innerHTML = '<p style="color:var(--muted);font-size:0.9rem;">Aucun concours actif.</p>';
+      document.getElementById('participantsCard').style.display = 'none';
+      return;
+    }
+    const doc = snap.docs[0];
+    const c = doc.data();
+    currentContestId = doc.id;
+    const end = c.endDate?.toDate ? c.endDate.toDate().toLocaleString('fr-FR') : '—';
+    el.innerHTML = `
+      <div class="contest-row">
+        <div class="contest-row-info">
+          <div class="contest-row-name">${c.prize} <span class="badge-active">Actif</span></div>
+          <div class="contest-row-date">Tirage le ${end}</div>
+        </div>
+      </div>`;
+    loadParticipants(doc.id, c.prize);
+  }
+
+  async function loadParticipants(contestId, contestName) {
+    const card = document.getElementById('participantsCard');
+    const list = document.getElementById('participantsList');
+    const noP  = document.getElementById('noParticipants');
+    const clot = document.getElementById('clotureSection');
+    card.style.display = 'block';
+    document.getElementById('contestNameInTitle').textContent = `— ${contestName}`;
+
+    // Cherche tous les utilisateurs ayant des tickets pour ce concours
+    const usersSnap = await db.collection('users').get();
+    const participants = [];
+    for (const userDoc of usersSnap.docs) {
+      const ticketDoc = await db.collection('users').doc(userDoc.id)
+        .collection('contestTickets').doc(contestId).get();
+      if (ticketDoc.exists) {
+        const data = ticketDoc.data();
+        if ((data.tickets || 0) > 0) {
+          participants.push({ snap: data.snap || '(snap non renseigne)', tickets: data.tickets });
+        }
+      }
+    }
+
+    if (participants.length === 0) {
+      noP.style.display = 'block'; list.innerHTML = '';
+      clot.style.display = 'none';
+      document.getElementById('wheelSection').style.display = 'none';
+      return;
+    }
+    noP.style.display = 'none'; clot.style.display = 'block';
+    participants.sort((a,b) => b.tickets - a.tickets);
+    list.innerHTML = participants.map(p => `
+      <li class="participant-row">
+        <span class="snap-name">@${p.snap}</span>
+        <span class="ticket-num">${p.tickets} ticket${p.tickets > 1 ? 's' : ''}</span>
+      </li>`).join('');
+
+    // Genere la liste pour la roue : chaque snap répété N fois (= nb tickets)
+    const wheelSection = document.getElementById('wheelSection');
+    const wheelList = document.getElementById('wheelList');
+    const entries = [];
+    for (const p of participants) {
+      for (let i = 0; i < p.tickets; i++) entries.push('@' + p.snap);
+    }
+    // Melange aléatoire pour éviter que les tickets du même snap soient groupés
+    for (let i = entries.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [entries[i], entries[j]] = [entries[j], entries[i]];
+    }
+    wheelList.value = entries.join('\n');
+    wheelSection.style.display = 'block';
+  }
+
+  function copyWheelList() {
+    const ta = document.getElementById('wheelList');
+    ta.select();
+    ta.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(ta.value).then(() => {
+      const msg = document.getElementById('copyMsg');
+      msg.textContent = 'Liste copiee !';
+      msg.className = 'msg ok'; msg.style.display = 'inline-block';
+      setTimeout(() => { msg.style.display = 'none'; }, 2500);
+    });
+  }
+
+  async function closeContest() {
+    const winner = document.getElementById('winnerSnap').value.trim();
+    const msg    = document.getElementById('clotureMsg');
+    if (!winner || !currentContestId) { msg.textContent = 'Entre le snap du gagnant.'; msg.className='msg err'; msg.style.display='block'; return; }
+    try {
+      await db.collection('contests').doc(currentContestId).update({ active: false, winner });
+      msg.textContent = `Concours clos ! Gagnant : @${winner}`;
+      msg.className = 'msg ok'; msg.style.display = 'block';
+      loadActiveContest(); loadHistory();
+    } catch(e) {
+      msg.textContent = 'Erreur : ' + e.message; msg.className='msg err'; msg.style.display='block';
+    }
+  }
+
+  async function loadHistory() {
+    const el = document.getElementById('historyList');
+    const snap = await db.collection('contests').where('active','==',false).orderBy('endDate','desc').limit(10).get();
+    if (snap.empty) { el.innerHTML = '<p style="color:var(--muted);font-size:0.9rem;">Aucun ancien concours.</p>'; return; }
+    el.innerHTML = snap.docs.map(d => {
+      const c = d.data();
+      const date = c.endDate?.toDate ? c.endDate.toDate().toLocaleDateString('fr-FR') : '—';
+      return `
+        <div class="contest-row">
+          <div class="contest-row-info">
+            <div class="contest-row-name">${c.prize} <span class="badge-done">Termine</span></div>
+            <div class="contest-row-date">${date}${c.winner ? ` · Gagnant : @${c.winner}` : ''}</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+</script>
+</body>
+</html>

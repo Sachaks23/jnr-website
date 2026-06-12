@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Avis — shop2puff</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">shop2puff</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="produits.html">Produits</a></li>
+    <li><a href="concours.html">Concours</a></li>
+    <li><a href="avis.html" class="active">Avis</a></li>
+    <li><a href="livraison.html">Livraison</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <a id="accountNavLink" class="nav-account-link" href="login.html">Connexion</a>
+    <button class="nav-hamburger" id="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<button class="cart-btn" onclick="openCart()">Panier<span class="cart-count" id="cartCount">0</span></button>
+
+<div class="page-hero">
+  <span class="section-tag">Ce qu'ils en pensent</span>
+  <h1>Avis <span style="background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">clients</span></h1>
+  <p>Des retours honnetes de nos clients.</p>
+</div>
+
+<section class="reviews-section">
+
+  <!-- RATING SUMMARY -->
+  <div class="rating-summary" id="ratingSummary">
+    <div class="rating-big">
+      <div class="score" id="avgScore">—</div>
+      <div class="stars" id="avgStars">— — — — —</div>
+      <p id="reviewCount">0 avis</p>
+    </div>
+    <div class="rating-bars" id="ratingBars"></div>
+  </div>
+
+  <!-- FORM POUR LAISSER UN AVIS -->
+  <div class="review-form-wrap">
+    <h3>Laisser un avis</h3>
+    <form id="reviewForm" onsubmit="submitReview(event)">
+      <div class="form-group">
+        <label>Prénom *</label>
+        <input type="text" id="reviewPrenom" placeholder="Ton prénom" required maxlength="30" />
+      </div>
+      <div class="form-group">
+        <label>Note *</label>
+        <div class="star-picker" id="starPicker">
+          <span data-val="1" onclick="setStars(1)">&#9733;</span>
+          <span data-val="2" onclick="setStars(2)">&#9733;</span>
+          <span data-val="3" onclick="setStars(3)">&#9733;</span>
+          <span data-val="4" onclick="setStars(4)">&#9733;</span>
+          <span data-val="5" onclick="setStars(5)">&#9733;</span>
+        </div>
+        <input type="hidden" id="reviewStars" value="0" />
+      </div>
+      <div class="form-group">
+        <label>Ton avis *</label>
+        <textarea id="reviewText" placeholder="Dis-nous ce que tu en penses..." rows="4" maxlength="400" required
+          style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:0.75rem 1rem;color:var(--text);font-size:0.9rem;font-family:inherit;outline:none;resize:vertical;transition:border-color 0.2s;"
+          onfocus="this.style.borderColor='var(--cyan)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;border:none;">Publier mon avis</button>
+    </form>
+  </div>
+
+  <!-- LISTE DES AVIS -->
+  <div class="reviews-grid" id="reviewsList"></div>
+
+  <p id="noReviews" style="text-align:center;color:var(--muted);padding:2rem;display:none;">Aucun avis pour le moment. Sois le premier !</p>
+
+</section>
+
+<footer>
+  <div class="footer-logo">shop2puff</div>
+  <p>Vente de puffs JNR — Livraison rapide partout en France</p>
+  <ul class="footer-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="produits.html">Produits</a></li>
+    <li><a href="concours.html">Concours</a></li>
+    <li><a href="avis.html">Avis</a></li>
+    <li><a href="livraison.html">Livraison</a></li>
+  </ul>
+  <p class="footer-copy">© 2025 shop2puff. Vente réservée aux personnes majeures (18 ans et plus).</p>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <h3>Mon panier</h3>
+    <button class="cart-close" onclick="closeCart()">x</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter"></div>
+</div>
+
+<div class="toast" id="toast">
+  <span id="toastMsg"></span>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="cart.js"></script>
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script>
+  let selectedStars = 0;
+
+  function setStars(val) {
+    selectedStars = val;
+    document.getElementById('reviewStars').value = val;
+    document.querySelectorAll('#starPicker span').forEach((el, i) => {
+      el.classList.toggle('active', i < val);
+    });
+  }
+
+  function getReviews() {
+    try { return JSON.parse(localStorage.getItem('s2p_reviews')) || []; }
+    catch { return []; }
+  }
+
+  function saveReviews(reviews) {
+    localStorage.setItem('s2p_reviews', JSON.stringify(reviews));
+  }
+
+  function submitReview(e) {
+    e.preventDefault();
+    if (selectedStars === 0) { alert('Choisis une note avant de publier.'); return; }
+
+    const prenom = document.getElementById('reviewPrenom').value.trim();
+    const text = document.getElementById('reviewText').value.trim();
+    if (!prenom || !text) return;
+
+    const reviews = getReviews();
+    reviews.unshift({
+      prenom,
+      stars: selectedStars,
+      text,
+      date: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+    });
+    saveReviews(reviews);
+
+    // Reset form
+    document.getElementById('reviewForm').reset();
+    selectedStars = 0;
+    document.querySelectorAll('#starPicker span').forEach(el => el.classList.remove('active'));
+
+    renderReviews();
+    showToast('Avis publie !');
+    window.scrollTo({ top: document.getElementById('reviewsList').offsetTop - 100, behavior: 'smooth' });
+  }
+
+  function renderReviews() {
+    const reviews = getReviews();
+    const listEl = document.getElementById('reviewsList');
+    const noEl = document.getElementById('noReviews');
+
+    if (reviews.length === 0) {
+      listEl.innerHTML = '';
+      noEl.style.display = 'block';
+    } else {
+      noEl.style.display = 'none';
+      listEl.innerHTML = reviews.map(r => `
+        <div class="review-card">
+          <div class="review-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</div>
+          <p class="review-text">${escapeHtml(r.text)}</p>
+          <div class="review-author">
+            <div class="review-avatar">${r.prenom.charAt(0).toUpperCase()}</div>
+            <div>
+              <div class="review-name">${escapeHtml(r.prenom)}</div>
+              <div class="review-date">${r.date}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Update summary
+    updateRatingSummary(reviews);
+  }
+
+  function updateRatingSummary(reviews) {
+    const scoreEl = document.getElementById('avgScore');
+    const starsEl = document.getElementById('avgStars');
+    const countEl = document.getElementById('reviewCount');
+    const barsEl = document.getElementById('ratingBars');
+
+    if (reviews.length === 0) {
+      scoreEl.textContent = '—';
+      starsEl.textContent = '— — — — —';
+      countEl.textContent = '0 avis';
+      barsEl.innerHTML = '';
+      return;
+    }
+
+    const avg = reviews.reduce((s, r) => s + r.stars, 0) / reviews.length;
+    scoreEl.textContent = avg.toFixed(1);
+    starsEl.innerHTML = '★'.repeat(Math.round(avg)) + '☆'.repeat(5 - Math.round(avg));
+    countEl.textContent = `${reviews.length} avis`;
+
+    const counts = [5,4,3,2,1].map(s => ({ s, n: reviews.filter(r => r.stars === s).length }));
+    barsEl.innerHTML = counts.map(({ s, n }) => `
+      <div class="rating-bar-row">
+        <span>${s} ★</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${reviews.length ? (n/reviews.length*100).toFixed(0) : 0}%"></div></div>
+        <span>${n}</span>
+      </div>
+    `).join('');
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  document.addEventListener('DOMContentLoaded', renderReviews);
+</script>
+</body>
+</html>

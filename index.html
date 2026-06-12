@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>shop2puff — Puffs JNR</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- AGE GATE -->
+<div class="age-gate" id="ageGate">
+  <div class="age-gate-box">
+    <div class="logo">shop2puff</div>
+    <h2>Vérification d'age</h2>
+    <p>Ce site vend des produits de vapotage contenant de la nicotine.<br>Vous devez avoir <strong>18 ans ou plus</strong> pour y accéder.</p>
+    <div class="age-gate-btns">
+      <button class="age-yes" onclick="confirmAge()">J'ai 18 ans ou plus</button>
+      <button class="age-no" onclick="denyAge()">J'ai moins de 18 ans</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="index.html" class="nav-logo">shop2puff</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html" class="active">Accueil</a></li>
+    <li><a href="produits.html">Produits</a></li>
+    <li><a href="concours.html">Concours</a></li>
+    <li><a href="avis.html">Avis</a></li>
+    <li><a href="livraison.html">Livraison</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <a id="accountNavLink" class="nav-account-link" href="login.html">Connexion</a>
+    <button class="nav-hamburger" id="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<button class="cart-btn" onclick="openCart()">Panier<span class="cart-count" id="cartCount">0</span></button>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <h1 class="fade-up">Les meilleures puffs<br><span class="grad-text">livrees chez toi</span></h1>
+    <p class="fade-up fade-up-d1">JNR 18K, 28K et 42K disponibles maintenant. Commande en quelques clics, livraison le jour même.</p>
+    <div class="hero-ctas fade-up fade-up-d2">
+      <a href="produits.html" class="btn-primary">Commander</a>
+      <a href="livraison.html" class="btn-secondary">Livraison</a>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES BAR -->
+<div class="features-bar">
+  <div class="features-grid">
+    <div class="feature-item">
+      <span><strong>Livraison le jour même</strong> — 5 €</span>
+    </div>
+    <div class="feature-item">
+      <span><strong>Livraison gratuite</strong> dès 2 produits</span>
+    </div>
+    <div class="feature-item">
+      <span><strong>Envoi national</strong> partout en France</span>
+    </div>
+    <div class="feature-item">
+      <span><strong>Paiement</strong> espèces ou PayPal</span>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTS PREVIEW -->
+<section class="products-section">
+  <div class="section-header">
+    <span class="section-tag">Notre gamme</span>
+    <h2>18K · 28K · 42K</h2>
+    <p>Choisissez votre modèle et votre gout.</p>
+  </div>
+  <div class="products-grid" id="homepageProducts" style="grid-template-columns:repeat(3,1fr);max-width:900px;margin:0 auto;"></div>
+  <div style="text-align:center;margin-top:2.5rem;">
+    <a href="produits.html" class="btn-primary">Voir tous les gouts</a>
+  </div>
+</section>
+
+<!-- DELIVERY SECTION -->
+<section class="delivery-section">
+  <div class="section-header">
+    <span class="section-tag">Livraison</span>
+    <h2>Simple et rapide</h2>
+  </div>
+  <div class="delivery-grid">
+    <div class="delivery-card">
+      <div class="delivery-icon" style="font-size:1rem;">J+0</div>
+      <h3>Livraison le jour même</h3>
+      <p>Recevez votre commande le jour même dans la zone de livraison.</p>
+      <span class="delivery-price">5,00 €</span>
+    </div>
+    <div class="delivery-card">
+      <div class="delivery-icon" style="font-size:0.8rem;">FREE</div>
+      <h3>Livraison gratuite</h3>
+      <p>La livraison est offerte dès l'achat de 2 produits ou plus.</p>
+      <span class="delivery-price">Gratuit</span>
+    </div>
+    <div class="delivery-card">
+      <div class="delivery-icon" style="font-size:0.75rem;">FR</div>
+      <h3>Envoi national</h3>
+      <p>Livraison partout en France par colis. Paiement requis avant expédition.</p>
+      <span class="delivery-price">France entiere</span>
+    </div>
+    <div class="delivery-card">
+      <div class="delivery-icon" style="font-size:0.75rem;">PAY</div>
+      <h3>Modes de paiement</h3>
+      <p>Espèces ou PayPal uniquement. Pas de paiement par carte en ligne.</p>
+      <span class="delivery-price">Espèces · PayPal</span>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">shop2puff</div>
+  <p>Vente de puffs JNR — Livraison rapide partout en France</p>
+  <ul class="footer-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="produits.html">Produits</a></li>
+    <li><a href="concours.html">Concours</a></li>
+    <li><a href="avis.html">Avis</a></li>
+    <li><a href="livraison.html">Livraison</a></li>
+  </ul>
+  <div class="footer-payment">
+    <div class="payment-pill">Espèces</div>
+    <div class="payment-pill">PayPal</div>
+    <div class="payment-pill">Livraison J+0</div>
+    <div class="payment-pill">France entiere</div>
+  </div>
+  <p class="footer-copy">© 2025 shop2puff. Vente réservée aux personnes majeures (18 ans et plus). La cigarette electronique contient de la nicotine, substance addictive.</p>
+</footer>
+
+<!-- CART PANEL -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <h3>Mon panier</h3>
+    <button class="cart-close" onclick="closeCart()">x</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span id="toastMsg"></span>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="cart.js"></script>
+<script src="app.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>

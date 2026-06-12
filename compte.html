@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mon compte — shop2puff</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .compte-page {
+      padding: 9rem 5% 5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .compte-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .compte-header h1 {
+      font-size: clamp(1.8rem, 4vw, 2.4rem);
+      font-weight: 900; letter-spacing: -1px;
+    }
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      color: var(--muted);
+      font-size: 0.85rem; font-weight: 600;
+      padding: 0.5rem 1.2rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .logout-btn:hover { border-color: var(--pink); color: var(--pink); }
+
+    /* FIDELITE */
+    .loyalty-card {
+      background: var(--bg2);
+      border: 1px solid rgba(0,229,255,0.2);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .loyalty-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 0% 50%, rgba(0,229,255,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .loyalty-label {
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--cyan); margin-bottom: 0.5rem;
+    }
+    .loyalty-title {
+      font-size: 1.1rem; font-weight: 800; margin-bottom: 1.2rem;
+    }
+    .loyalty-progress-wrap {
+      display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem;
+    }
+    .loyalty-dots {
+      display: flex; gap: 0.5rem;
+    }
+    .loyalty-dot {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      background: var(--bg3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem; font-weight: 800;
+      color: var(--muted);
+      transition: all 0.3s;
+    }
+    .loyalty-dot.filled {
+      background: var(--grad);
+      border-color: transparent;
+      color: #fff;
+    }
+    .loyalty-dot.free {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #000;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,215,0,0.4); }
+      50% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(255,215,0,0); }
+    }
+    .loyalty-info { font-size: 0.85rem; color: var(--muted); }
+    .loyalty-info strong { color: var(--text); }
+
+    .free-puff-banner {
+      background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.05));
+      border: 1px solid rgba(255,215,0,0.4);
+      border-radius: 12px;
+      padding: 1rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--gold);
+      margin-top: 1rem;
+      display: none;
+    }
+    .free-puff-banner.show { display: block; }
+
+    /* HISTORIQUE */
+    .section-title {
+      font-size: 1.1rem; font-weight: 800;
+      margin-bottom: 1.2rem;
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+    .order-count-badge {
+      background: var(--grad);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 0.2rem 0.6rem;
+      border-radius: 50px;
+    }
+
+    .order-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+    }
+    .order-card:hover { border-color: rgba(124,58,237,0.3); }
+
+    .order-card-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1rem 1.3rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+    .order-date {
+      font-size: 0.82rem; color: var(--muted);
+    }
+    .order-total-badge {
+      font-size: 0.95rem; font-weight: 900;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .order-toggle {
+      color: var(--muted); font-size: 0.8rem; font-weight: 700;
+      transition: transform 0.2s;
+    }
+    .order-toggle.open { transform: rotate(180deg); }
+
+    .order-card-body {
+      padding: 1rem 1.3rem;
+      display: none;
+    }
+    .order-card-body.open { display: block; }
+
+    .order-item-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+    }
+    .order-item-row:last-child { border-bottom: none; }
+    .order-item-name { color: var(--muted); }
+    .order-item-price { font-weight: 700; }
+
+    .order-meta {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      margin-top: 0.8rem;
+    }
+    .order-meta-pill {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 0.25rem 0.7rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .empty-history {
+      text-align: center; padding: 3rem;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--muted); font-size: 0.9rem;
+    }
+    .empty-history a { color: var(--cyan); font-weight: 600; }
+
+    .loading-state {
+      text-align: center; padding: 3rem;
+      color: var(--muted); font-size: 0.9rem;
+    }
+  </style>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">shop2puff</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="produits.html">Produits</a></li>
+    <li><a href="concours.html">Concours</a></li>
+    <li><a href="avis.html">Avis</a></li>
+    <li><a href="livraison.html">Livraison</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <a id="accountNavLink" class="nav-account-link active" href="compte.html">Mon compte</a>
+    <button class="nav-hamburger" id="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<button class="cart-btn" onclick="openCart()">Panier<span class="cart-count" id="cartCount">0</span></button>
+
+<div class="compte-page">
+
+  <div id="loadingState" class="loading-state">Chargement...</div>
+
+  <div id="compteContent" style="display:none;">
+
+    <!-- HEADER -->
+    <div class="compte-header">
+      <div>
+        <h1>Mon <span style="background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">compte</span></h1>
+        <p style="color:var(--muted);font-size:0.88rem;margin-top:0.3rem;" id="userEmailDisplay"></p>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Se déconnecter</button>
+    </div>
+
+    <!-- FIDELITE -->
+    <div class="loyalty-card">
+      <div class="loyalty-label">Programme fidelite</div>
+      <div class="loyalty-title">1 puff offerte toutes les 5 achetées</div>
+      <div class="loyalty-progress-wrap">
+        <div class="loyalty-dots" id="loyaltyDots"></div>
+      </div>
+      <div class="loyalty-info" id="loyaltyInfo"></div>
+      <div class="free-puff-banner" id="freePuffBanner">
+        Tu as une puff gratuite disponible ! Contacte-nous sur Snap pour en profiter.
+      </div>
+    </div>
+
+    <!-- HISTORIQUE -->
+    <div class="section-title">
+      Historique de commandes
+      <span class="order-count-badge" id="orderCountBadge">0</span>
+    </div>
+
+    <div id="orderHistory">
+      <div class="loading-state">Chargement des commandes...</div>
+    </div>
+
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-logo">shop2puff</div>
+  <p>Vente de puffs JNR — Livraison rapide partout en France</p>
+  <ul class="footer-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="produits.html">Produits</a></li>
+    <li><a href="concours.html">Concours</a></li>
+    <li><a href="avis.html">Avis</a></li>
+    <li><a href="livraison.html">Livraison</a></li>
+  </ul>
+  <p class="footer-copy">© 2025 shop2puff. Vente réservée aux personnes majeures (18 ans et plus).</p>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <h3>Mon panier</h3>
+    <button class="cart-close" onclick="closeCart()">x</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter"></div>
+</div>
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script src="cart.js"></script>
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script>
+  auth.onAuthStateChanged(async user => {
+    const loadingEl  = document.getElementById('loadingState');
+    const contentEl  = document.getElementById('compteContent');
+
+    if (!user || !user.emailVérified) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    loadingEl.style.display = 'none';
+    contentEl.style.display = 'block';
+    document.getElementById('userEmailDisplay').textContent = user.email;
+
+    // Charge le profil + commandes
+    await loadProfile(user.uid);
+    await loadOrders(user.uid);
+  });
+
+  async function loadProfile(uid) {
+    try {
+      const doc = await db.collection('users').doc(uid).get();
+      if (!doc.exists) return;
+      const data = doc.data();
+
+      const total    = data.totalPuffsBought || 0;
+      const freeUsed = data.freeUsed || 0;
+      const progress = total % 5;
+      const freeEarned = Math.floor(total / 5);
+      const pending  = freeEarned - freeUsed;
+
+      // Dots
+      const dotsEl = document.getElementById('loyaltyDots');
+      dotsEl.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'loyalty-dot' + (i <= progress ? ' filled' : '');
+        dot.textContent = i;
+        dotsEl.appendChild(dot);
+      }
+
+      // Info
+      const toNext = 5 - progress;
+      document.getElementById('loyaltyInfo').innerHTML =
+        `<strong>${total}</strong> puff${total > 1 ? 's' : ''} achetée${total > 1 ? 's' : ''} au total — ` +
+        (toNext === 5
+          ? `commence une nouvelle serie !`
+          : `encore <strong>${toNext}</strong> pour ta prochaine puff offerte.`);
+
+      // Banner puff gratuite
+      if (pending > 0) {
+        const banner = document.getElementById('freePuffBanner');
+        banner.classList.add('show');
+        banner.textContent = `Tu as ${pending} puff${pending > 1 ? 's' : ''} gratuite${pending > 1 ? 's' : ''} disponible${pending > 1 ? 's' : ''} ! Contacte-nous sur Snap pour en profiter.`;
+      }
+    } catch (err) {
+      console.error('Erreur profil:', err);
+    }
+  }
+
+  async function loadOrders(uid) {
+    const historyEl = document.getElementById('orderHistory');
+    try {
+      const snap = await db.collection('users').doc(uid)
+        .collection('orders')
+        .orderBy('date', 'desc')
+        .get();
+
+      document.getElementById('orderCountBadge').textContent = snap.size;
+
+      if (snap.empty) {
+        historyEl.innerHTML = `
+          <div class="empty-history">
+            <p>Aucune commande pour le moment.</p>
+            <a href="produits.html">Voir les produits</a>
+          </div>`;
+        return;
+      }
+
+      historyEl.innerHTML = snap.docs.map((doc, idx) => {
+        const o = doc.data();
+        const date = o.date?.toDate
+          ? o.date.toDate().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+          : 'Date inconnue';
+        const items = o.items || [];
+        const total = items.reduce((s, i) => s + (i.price * i.qty), 0);
+
+        return `
+          <div class="order-card">
+            <div class="order-card-header" onclick="toggleOrder('order-${idx}')">
+              <div>
+                <div style="font-weight:700;font-size:0.9rem;margin-bottom:0.2rem;">Commande du ${date}</div>
+                <div class="order-date">${items.length} article${items.length > 1 ? 's' : ''}</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:1rem;">
+                <span class="order-total-badge">${total.toFixed(2).replace('.', ',')} €</span>
+                <span class="order-toggle" id="toggle-order-${idx}">v</span>
+              </div>
+            </div>
+            <div class="order-card-body" id="order-${idx}">
+              ${items.map(i => `
+                <div class="order-item-row">
+                  <span class="order-item-name">${i.name} x${i.qty}</span>
+                  <span class="order-item-price">${(i.price * i.qty).toFixed(2).replace('.', ',')} €</span>
+                </div>
+              `).join('')}
+              <div class="order-meta">
+                <span class="order-meta-pill">${o.delivery || '—'}</span>
+                <span class="order-meta-pill">${o.payment || '—'}</span>
+                <span class="order-meta-pill">${o.address || '—'}</span>
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+
+    } catch (err) {
+      historyEl.innerHTML = `<div class="empty-history"><p>Impossible de charger les commandes.</p></div>`;
+      console.error(err);
+    }
+  }
+
+  function toggleOrder(id) {
+    const body   = document.getElementById(id);
+    const toggle = document.getElementById('toggle-' + id);
+    body.classList.toggle('open');
+    toggle.classList.toggle('open');
+  }
+
+  async function doLogout() {
+    await auth.signOut();
+    localStorage.removeItem('s2p_login_date');
+    window.location.href = 'index.html';
+  }
+</script>
+</body>
+</html>

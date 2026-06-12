@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Connexion — shop2puff</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .auth-page {
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      padding: 2rem;
+      background: var(--bg);
+    }
+    .auth-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 420px;
+    }
+    .auth-logo {
+      font-size: 1.5rem; font-weight: 900;
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      margin-bottom: 2rem;
+      display: block;
+    }
+    .auth-tabs {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    .auth-tab {
+      padding: 0.7rem;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      transition: all 0.2s;
+    }
+    .auth-tab.active {
+      background: var(--grad);
+      color: #fff;
+    }
+    .auth-form { display: none; }
+    .auth-form.active { display: block; }
+
+    .auth-form .form-group { margin-bottom: 1.1rem; }
+    .auth-form label {
+      display: block; font-size: 0.78rem; font-weight: 600;
+      color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.05em; margin-bottom: 0.4rem;
+    }
+    .auth-form input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-text-fill-color: var(--text);
+    }
+    .auth-form input:focus { border-color: var(--cyan); }
+
+    .auth-submit {
+      width: 100%;
+      background: var(--grad);
+      color: #fff; border: none; border-radius: 50px;
+      padding: 0.9rem; font-size: 0.95rem; font-weight: 800;
+      cursor: pointer; margin-top: 0.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .auth-submit:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(0,229,255,0.3); }
+    .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .auth-error {
+      background: rgba(244,63,142,0.1);
+      border: 1px solid rgba(244,63,142,0.3);
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      font-size: 0.85rem;
+      color: #fca5a5;
+      margin-top: 1rem;
+      display: none;
+    }
+    .auth-success {
+      background: rgba(0,229,255,0.08);
+      border: 1px solid rgba(0,229,255,0.25);
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      font-size: 0.85rem;
+      color: var(--cyan);
+      margin-top: 1rem;
+      display: none;
+      line-height: 1.6;
+    }
+
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .forgot-link:hover { color: var(--cyan); }
+
+    .reset-section { display: none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+    .reset-section.show { display: block; }
+    .reset-section h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 1rem; }
+
+    .auth-info {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 1.5rem;
+      line-height: 1.6;
+    }
+  </style>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">shop2puff</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="produits.html">Produits</a></li>
+    <li><a href="avis.html">Avis</a></li>
+    <li><a href="livraison.html">Livraison</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <a id="accountNavLink" class="nav-account-link active" href="login.html">Connexion</a>
+    <button class="nav-hamburger" id="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<button class="cart-btn" onclick="openCart()">Panier<span class="cart-count" id="cartCount">0</span></button>
+
+<div class="auth-page">
+  <div class="auth-box">
+    <a href="index.html" class="auth-logo">shop2puff</a>
+
+    <!-- TABS -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Connexion</button>
+      <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Créer un compte</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div class="auth-form active" id="formLogin">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="ton@mail.com" autocomplete="email" />
+      </div>
+      <div class="form-group" style="position:relative;">
+        <label>Mot de passe</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" style="padding-right:2.8rem;" />
+        <button type="button" onclick="togglePwd('loginPassword','eyeLogin')" style="position:absolute;right:0.9rem;bottom:0.75rem;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;" id="eyeLogin">👁</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.2rem;">
+        <input type="checkbox" id="rememberMe" style="width:16px;height:16px;accent-color:var(--cyan);cursor:pointer;" />
+        <label for="rememberMe" style="font-size:0.82rem;color:var(--muted);cursor:pointer;text-transform:none;letter-spacing:0;">Rester connecte pendant 30 jours</label>
+      </div>
+      <span class="forgot-link" onclick="toggleReset()">Mot de passe oublie ?</span>
+      <button class="auth-submit" id="loginBtn" onclick="doLogin()">Se connecter</button>
+      <div class="auth-error" id="loginError"></div>
+      <div class="auth-success" id="loginSuccess"></div>
+
+      <!-- RESET PASSWORD -->
+      <div class="reset-section" id="resetSection">
+        <h4>Réinitialiser le mot de passe</h4>
+        <div class="form-group">
+          <label>Ton email</label>
+          <input type="email" id="resetEmail" placeholder="ton@mail.com" />
+        </div>
+        <button class="auth-submit" style="margin-top:0;" onclick="doReset()">Envoyer le lien</button>
+        <div class="auth-error" id="resetError"></div>
+        <div class="auth-success" id="resetSuccess"></div>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div class="auth-form" id="formRegister">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="regEmail" placeholder="ton@mail.com" autocomplete="email" />
+      </div>
+      <div class="form-group" style="position:relative;">
+        <label>Mot de passe <span style="color:var(--muted);font-size:0.75rem;">(min. 6 caracteres)</span></label>
+        <input type="password" id="regPassword" placeholder="••••••••" autocomplete="new-password" style="padding-right:2.8rem;" />
+        <button type="button" onclick="togglePwd('regPassword','eyeReg')" style="position:absolute;right:0.9rem;bottom:0.75rem;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;" id="eyeReg">👁</button>
+      </div>
+      <div class="form-group" style="position:relative;">
+        <label>Confirmer le mot de passe</label>
+        <input type="password" id="regConfirm" placeholder="••••••••" autocomplete="new-password" style="padding-right:2.8rem;" />
+        <button type="button" onclick="togglePwd('regConfirm','eyeConf')" style="position:absolute;right:0.9rem;bottom:0.75rem;background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;" id="eyeConf">👁</button>
+      </div>
+      <button class="auth-submit" id="registerBtn" onclick="doRegister()">Créer mon compte</button>
+      <div class="auth-error" id="registerError"></div>
+      <div class="auth-success" id="registerSuccess"></div>
+
+      <p class="auth-info">Un email de confirmation sera envoye a ton adresse. Tu devras valider ton compte pour accéder a l'historique de commandes.</p>
+    </div>
+
+  </div>
+</div>
+
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <h3>Mon panier</h3>
+    <button class="cart-close" onclick="closeCart()">x</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter"></div>
+</div>
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script src="cart.js"></script>
+<script src="app.js"></script>
+<script src="auth.js"></script>
+<script>
+  // Si deja connecte, redirige vers le compte
+  auth.onAuthStateChanged(user => {
+    if (user && user.emailVérified) {
+      window.location.href = 'compte.html';
+    }
+  });
+
+  function switchTab(tab) {
+    document.getElementById('formLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('formRegister').classList.toggle('active', tab === 'register');
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  }
+
+  function togglePwd(inputId, btnId) {
+    const input = document.getElementById(inputId);
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    document.getElementById(btnId).style.opacity = isHidden ? '1' : '0.4';
+  }
+
+  function toggleReset() {
+    document.getElementById('resetSection').classList.toggle('show');
+  }
+
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg; el.style.display = 'block';
+    document.getElementById(id.replace('Error','Success')).style.display = 'none';
+  }
+  function showSuccess(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg; el.style.display = 'block';
+    document.getElementById(id.replace('Success','Error')).style.display = 'none';
+  }
+  function clearMessages(...ids) {
+    ids.forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+  }
+
+  async function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pwd   = document.getElementById('loginPassword').value;
+    clearMessages('loginError','loginSuccess');
+    if (!email || !pwd) { showError('loginError', 'Remplis tous les champs.'); return; }
+
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true; btn.textContent = 'Connexion...';
+
+    try {
+      const remember = document.getElementById('rememberMe').checked;
+      await auth.setPersistence(remember
+        ? firebase.auth.Auth.Persistence.LOCAL
+        : firebase.auth.Auth.Persistence.SESSION);
+      const cred = await auth.signInWithEmailAndPassword(email, pwd);
+      if (!cred.user.emailVérified) {
+        await auth.signOut();
+        showError('loginError', 'Vérifie ton email — un lien de confirmation t\'a ete envoye a la creation du compte.');
+        btn.disabled = false; btn.textContent = 'Se connecter';
+        return;
+      }
+      if (remember) localStorage.setItem('s2p_login_date', Date.now().toString());
+      window.location.href = 'compte.html';
+    } catch (err) {
+      btn.disabled = false; btn.textContent = 'Se connecter';
+      showError('loginError', translateAuthError(err.code));
+    }
+  }
+
+  async function doRegister() {
+    const email   = document.getElementById('regEmail').value.trim();
+    const pwd     = document.getElementById('regPassword').value;
+    const confirm = document.getElementById('regConfirm').value;
+    clearMessages('registerError','registerSuccess');
+
+    if (!email || !pwd || !confirm) { showError('registerError', 'Remplis tous les champs.'); return; }
+    if (pwd.length < 6) { showError('registerError', 'Le mot de passe doit faire au moins 6 caracteres.'); return; }
+    if (pwd !== confirm) { showError('registerError', 'Les mots de passe ne correspondent pas.'); return; }
+
+    const btn = document.getElementById('registerBtn');
+    btn.disabled = true; btn.textContent = 'Creation...';
+
+    try {
+      const cred = await auth.createUserWithEmailAndPassword(email, pwd);
+      // Email de confirmation
+      await cred.user.sendEmailVérification();
+      // Profil initial dans Firestore
+      await db.collection('users').doc(cred.user.uid).set({
+        email,
+        totalPuffsBought: 0,
+        freeUsed: 0,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      await auth.signOut();
+      showSuccess('registerSuccess', 'Compte créé ! Vérifie ta boite mail pour confirmer ton adresse, puis connecte-toi.');
+    } catch (err) {
+      showError('registerError', translateAuthError(err.code));
+    }
+    btn.disabled = false; btn.textContent = 'Créer mon compte';
+  }
+
+  async function doReset() {
+    const email = document.getElementById('resetEmail').value.trim();
+    clearMessages('resetError','resetSuccess');
+    if (!email) { showError('resetError', 'Entre ton email.'); return; }
+    try {
+      await auth.sendPasswordResetEmail(email);
+      showSuccess('resetSuccess', 'Lien de reinitialisation envoye ! Vérifie ta boite mail.');
+    } catch (err) {
+      showError('resetError', translateAuthError(err.code));
+    }
+  }
+
+  function translateAuthError(code) {
+    const errors = {
+      'auth/user-not-found':      'Aucun compte trouve avec cet email.',
+      'auth/wrong-password':      'Mot de passe incorrect.',
+      'auth/email-already-in-use':'Un compte existe deja avec cet email.',
+      'auth/invalid-email':       'Email invalide.',
+      'auth/weak-password':       'Mot de passe trop faible (min. 6 caracteres).',
+      'auth/too-many-requests':   'Trop de tentatives. Reessaie dans quelques minutes.',
+      'auth/network-request-failed': 'Erreur reseau. Vérifie ta connexion.',
+      'auth/invalid-credential':  'Email ou mot de passe incorrect.',
+    };
+    return errors[code] || 'Une erreur est survenue. Reessaie.';
+  }
+
+  // Connexion au clavier (Entree)
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter') return;
+    if (document.getElementById('formLogin').classList.contains('active')) doLogin();
+    else doRegister();
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Livraison — shop2puff</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">shop2puff</a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="produits.html">Produits</a></li>
+    <li><a href="concours.html">Concours</a></li>
+    <li><a href="avis.html">Avis</a></li>
+    <li><a href="livraison.html" class="active">Livraison</a></li>
+  </ul>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <a id="accountNavLink" class="nav-account-link" href="login.html">Connexion</a>
+    <button class="nav-hamburger" id="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<button class="cart-btn" onclick="openCart()">Panier<span class="cart-count" id="cartCount">0</span></button>
+
+<div class="page-hero">
+  <span class="section-tag">Expédition et paiement</span>
+  <h1>Livraison <span style="background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">et paiement</span></h1>
+  <p>Tout ce que vous devez savoir.</p>
+</div>
+
+<section style="padding:3rem 5% 6rem;max-width:860px;margin:0 auto;">
+  <div style="display:grid;gap:1.5rem;">
+
+    <div class="delivery-card" style="padding:2rem;">
+      <div style="display:flex;align-items:flex-start;gap:1.2rem;">
+        <div class="delivery-icon" style="font-size:0.85rem;flex-shrink:0;">J+0</div>
+        <div>
+          <h3 style="font-size:1.05rem;margin-bottom:0.5rem;">Livraison le jour même — 5,00 €</h3>
+          <p style="color:var(--muted);font-size:0.9rem;line-height:1.7;">Recevez votre puff le jour même de votre commande dans la zone de livraison.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="delivery-card" style="padding:2rem;">
+      <div style="display:flex;align-items:flex-start;gap:1.2rem;">
+        <div class="delivery-icon" style="font-size:0.7rem;flex-shrink:0;">FREE</div>
+        <div>
+          <h3 style="font-size:1.05rem;margin-bottom:0.5rem;">Livraison gratuite dès 2 produits</h3>
+          <p style="color:var(--muted);font-size:0.9rem;line-height:1.7;">Achetez 2 produits ou plus et la livraison est entierement offerte.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="delivery-card" style="padding:2rem;">
+      <div style="display:flex;align-items:flex-start;gap:1.2rem;">
+        <div class="delivery-icon" style="font-size:0.85rem;flex-shrink:0;">FR</div>
+        <div>
+          <h3 style="font-size:1.05rem;margin-bottom:0.5rem;">Envoi national — Partout en France</h3>
+          <p style="color:var(--muted);font-size:0.9rem;line-height:1.7;">Nous livrons partout en France metropolitaine par colis. <strong style="color:var(--pink);">Le paiement complet est requis avant toute expédition.</strong> Les modalités sont gerees directement par Snap apres validation de la commande.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="delivery-card" style="padding:2rem;">
+      <div style="display:flex;align-items:flex-start;gap:1.2rem;">
+        <div class="delivery-icon" style="font-size:0.7rem;flex-shrink:0;">PAY</div>
+        <div>
+          <h3 style="font-size:1.05rem;margin-bottom:0.5rem;">Modes de paiement acceptes</h3>
+          <p style="color:var(--muted);font-size:0.9rem;line-height:1.7;">Nous n'acceptons pas les paiements par carte bancaire en ligne.</p>
+          <div style="display:flex;gap:1rem;margin-top:1rem;flex-wrap:wrap;">
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1rem 1.5rem;text-align:center;min-width:120px;">
+              <strong style="display:block;font-size:0.9rem;margin-bottom:0.2rem;">Espèces</strong>
+              <span style="color:var(--muted);font-size:0.78rem;">En main propre</span>
+            </div>
+            <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1rem 1.5rem;text-align:center;min-width:120px;">
+              <strong style="display:block;font-size:0.9rem;margin-bottom:0.2rem;">PayPal</strong>
+              <span style="color:var(--muted);font-size:0.78rem;">Paiement sécurisé</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="margin-top:3rem;text-align:center;">
+    <a href="produits.html" class="btn-primary">Voir les produits</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">shop2puff</div>
+  <p>Vente de puffs JNR — Livraison rapide partout en France</p>
+  <ul class="footer-links">
+    <li><a href="index.html">Accueil</a></li>
+    <li><a href="produits.html">Produits</a></li>
+    <li><a href="concours.html">Concours</a></li>
+    <li><a href="avis.html">Avis</a></li>
+    <li><a href="livraison.html">Livraison</a></li>
+  </ul>
+  <p class="footer-copy">© 2025 shop2puff. Vente réservée aux personnes majeures (18 ans et plus).</p>
+</footer>
+
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <h3>Mon panier</h3>
+    <button class="cart-close" onclick="closeCart()">x</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer" id="cartFooter"></div>
+</div>
+
+<div class="toast" id="toast">
+  <span id="toastMsg"></span>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="cart.js"></script>
+<script src="app.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>
