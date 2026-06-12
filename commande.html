@@ -280,7 +280,7 @@
         commande_details: commandeDetails,
       });
     } catch (err) {
-      alert('Erreur EmailJS : ' + (err?.text || err?.message || JSON.stringify(err)));
+      console.warn('EmailJS erreur:', err);
     }
 
     // Sauvegarder dans Firebase (si connecte)
