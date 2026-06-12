@@ -916,21 +916,47 @@ footer p { color: var(--muted); font-size: 0.85rem; line-height: 1.8; }
   .payment-options { grid-template-columns: 1fr; }
   .rating-summary { flex-direction: column; gap: 1.5rem; }
 
-  /* Products grid : 1 colonne sur mobile */
+  /* Products grid : 2 colonnes sur mobile */
   .products-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.8rem;
   }
 
   /* Prix produit plus compact */
   .product-price {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
+
+  /* Bouton ajouter plus petit sur mobile */
+  .add-to-cart {
+    font-size: 0.72rem;
+    padding: 0.4rem 0.7rem;
+  }
+
+  /* Nom produit plus petit */
+  .product-name {
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .product-info { padding: 0.8rem; }
 
   /* Espace en bas pour que le bouton panier fixe ne cache pas le contenu */
   body { padding-bottom: 5rem; }
 
   /* Sections produits moins de padding */
-  .products-section { padding: 2rem 4%; }
+  .products-section { padding: 2rem 3%; }
+
+  /* Search bar réduite sur mobile */
+  .search-wrap input { width: 90px; }
+  .search-wrap { padding: 0.4rem 0.7rem; }
+
+  /* Page d'accueil : cartes en colonne (footer en colonne pour éviter chevauchement) */
+  .homepage-products .product-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
 }
 
 /* ===== ANIMATIONS ===== */
