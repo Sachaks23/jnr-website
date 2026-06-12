@@ -1,6 +1,6 @@
 // ===== PRODUCT DATA =====
 // Prix provisoires — modifiez ici pour changer les prix
-const PRICES = { '28k': 17.99, '42k': 24.99 };
+const PRICES = { '28k': 10, '42k': 10 };
 
 const FLAVORS_28K = [
   'Blueberry Ice', 'Watermelon Ice', 'Mango Ice', 'Strawberry Ice',
