@@ -131,7 +131,7 @@ function showToast(msg) {
   msgEl.textContent = msg;
   toast.classList.add('show');
   clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => toast.classList.remove('show'), 3000);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 1500);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
