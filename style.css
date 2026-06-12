@@ -254,6 +254,7 @@ nav {
   padding: 0.9rem 5%;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.7rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -290,6 +291,15 @@ nav {
   margin-left: auto;
   flex-shrink: 0;
   transition: border-color 0.2s;
+}
+
+@media (max-width: 700px) {
+  .search-wrap {
+    margin-left: 0;
+    width: 100%;
+    flex-shrink: unset;
+  }
+  .search-wrap input { width: 100%; }
 }
 .search-wrap:focus-within { border-color: var(--cyan); }
 .search-wrap svg { color: var(--muted); flex-shrink: 0; }
@@ -947,9 +957,7 @@ footer p { color: var(--muted); font-size: 0.85rem; line-height: 1.8; }
   /* Sections produits moins de padding */
   .products-section { padding: 2rem 3%; }
 
-  /* Search bar réduite sur mobile */
-  .search-wrap input { width: 90px; }
-  .search-wrap { padding: 0.4rem 0.7rem; }
+
 
   /* Page d'accueil : cartes en colonne (footer en colonne pour éviter chevauchement) */
   .homepage-products .product-footer {
